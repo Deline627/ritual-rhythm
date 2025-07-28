@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ritual Rhythm</title>
+    
+    <!-- Cache Control Headers -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Your sacred guide for remembrance, alignment, and expansion">
+    <meta name="theme-color" content="#8B5CF6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ritual Rhythm">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-indigo': '#1E293B',
+                        'amethyst': '#8B5CF6',
+                        'gold': '#FBBF24',
+                        'rose-clay': '#F472B6',
+                        'soft-cream': '#FDF6E3',
+                        'mint': '#6EE7B7',
+                        'quartz': '#475569'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-indigo text-soft-cream min-h-screen font-sans">
+    <!-- Password Protection Screen -->
+    <div id="password-screen" class="fixed inset-0 bg-dark-indigo flex items-center justify-center z-50">
+        <div class="container mx-auto px-4 max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-amethyst mb-4">Ritual Rhythm</h1>
+                <p class="text-soft-cream/80 text-sm leading-relaxed mb-6">Enter your sacred access key to begin</p>
+            </div>
+            
+            <div class="bg-quartz/30 rounded-lg p-6 border border-quartz">
+                <input 
+                    type="password" 
+                    id="password-input" 
+                    placeholder="Sacred access key..."
+                    class="w-full bg-dark-indigo/50 border border-quartz rounded-lg p-3 text-soft-cream placeholder-soft-cream/50 focus:outline-none focus:border-amethyst transition-colors mb-4"
+                    autocomplete="off"
+                >
+                <button 
+                    onclick="checkPassword()" 
+                    class="w-full bg-amethyst hover:bg-amethyst/80 text-soft-cream font-semibold py-3 px-6 rounded-lg transition-all duration-200 mb-3"
+                >
+                    Enter Sacred Space
+                </button>
+                <div id="password-error" class="text-rose-clay text-sm text-center hidden">
+                    The sacred key is not recognized. Please try again.
+                </div>
+            </div>
+            
+            <div class="text-center text-xs text-soft-cream/50 mt-6">
+                <p>Sacred practice for spiritual expansion</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Reset Banner -->
+    <div id="weekly-reset-banner" class="fixed top-0 left-0 right-0 bg-mint/90 text-dark-indigo text-center py-2 px-4 text-sm font-medium z-40 transform -translate-y-full transition-all duration-500 hidden">
+        🌙 New Week Activated - Your sacred space has been refreshed
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-md" id="main-content" style="display: none;">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-amethyst mb-2">Ritual Rhythm</h1>
+            <p class="text-soft-cream/80 text-sm leading-relaxed">Your sacred guide for remembrance, alignment, and expansion.</p>
+        </div>
+
+        <!-- Quote of the Day -->
+        <div class="bg-quartz/30 rounded-lg p-4 mb-6 border border-quartz">
+            <div class="text-center">
+                <p id="daily-quote" class="text-mint italic text-sm mb-2">Loading wisdom...</p>
+                <span id="quote-day" class="text-gold text-xs font-medium"></span>
+            </div>
+        </div>
+
+        <!-- Habit Tracking Visualization - PROMINENT DISPLAY -->
+        <div class="bg-amethyst/20 border-2 border-amethyst rounded-lg p-6 mb-6 shadow-lg" style="border-color: #8B5CF6 !important; background-color: rgba(139, 92, 246, 0.25) !important;">
+            <div class="text-center mb-4">
+                <h3 class="text-amethyst font-bold text-base mb-2">🌟 Sacred Practice Journey</h3>
+                <div class="flex justify-between text-sm text-soft-cream mb-3">
+                    <span id="streak-count" class="font-medium">Streak: 0 days</span>
+                    <span id="weekly-rate" class="font-medium">This week: 0%</span>
+                </div>
+            </div>
+            <div id="habit-visualization" class="flex justify-center mb-3">
+                <div class="grid grid-cols-7 gap-1">
+                    <!-- Default calendar structure for immediate visibility -->
+                    <div class="text-center text-xs text-soft-cream/60 font-medium p-1">S</div>
+                    <div class="text-center text-xs text-soft-cream/60 font-medium p-1">M</div>
+                    <div class="text-center text-xs text-soft-cream/60 font-medium p-1">T</div>
+                    <div class="text-center text-xs text-soft-cream/60 font-medium p-1">W</div>
+                    <div class="text-center text-xs text-soft-cream/60 font-medium p-1">T</div>
+                    <div class="text-center text-xs text-soft-cream/60 font-medium p-1">F</div>
+                    <div class="text-center text-xs text-soft-cream/60 font-medium p-1">S</div>
+                    <!-- Sample calendar squares -->
+                    <div class="w-5 h-5 rounded-sm border bg-quartz/20 border-quartz/30"></div>
+                    <div class="w-5 h-5 rounded-sm border bg-quartz/20 border-quartz/30"></div>
+                    <div class="w-5 h-5 rounded-sm border bg-quartz/20 border-quartz/30"></div>
+                    <div class="w-5 h-5 rounded-sm border bg-quartz/20 border-quartz/30"></div>
+                    <div class="w-5 h-5 rounded-sm border bg-quartz/20 border-quartz/30"></div>
+                    <div class="w-5 h-5 rounded-sm border bg-quartz/20 border-quartz/30"></div>
+                    <div class="w-5 h-5 rounded-sm border bg-mint border-mint shadow-sm"></div>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-soft-cream/80">Complete rituals to build your sacred pattern</p>
+                <button onclick="forceRefreshHabitTracking()" class="mt-3 bg-mint/30 hover:bg-mint/40 border border-mint text-mint px-3 py-1 rounded text-xs font-medium transition-all duration-200">
+                    Update Tracking
+                </button>
+            </div>
+        </div>
+
+        <!-- Daily Ritual Grid -->
+        <div class="grid grid-cols-1 gap-3 mb-6">
+            <div class="grid grid-cols-2 gap-3">
+                <a href="sunday.html" class="ritual-day-button group" data-day="sunday">
+                    <div class="bg-rose-clay/20 hover:bg-rose-clay/30 border border-rose-clay/50 rounded-lg p-4 text-center transition-all duration-200 relative">
+                        <div class="completion-badge hidden absolute -top-2 -right-2 bg-mint text-dark-indigo rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">✓</div>
+                        <div class="text-2xl mb-1">🌞</div>
+                        <div class="text-sm font-medium text-soft-cream">Sunday</div>
+                        <div class="text-xs text-soft-cream/70 mt-1">The Throne</div>
+                    </div>
+                </a>
+                
+                <a href="monday.html" class="ritual-day-button group" data-day="monday">
+                    <div class="bg-rose-clay/20 hover:bg-rose-clay/30 border border-rose-clay/50 rounded-lg p-4 text-center transition-all duration-200 relative">
+                        <div class="completion-badge hidden absolute -top-2 -right-2 bg-mint text-dark-indigo rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">✓</div>
+                        <div class="text-2xl mb-1">🌙</div>
+                        <div class="text-sm font-medium text-soft-cream">Monday</div>
+                        <div class="text-xs text-soft-cream/70 mt-1">Alignment</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <a href="tuesday.html" class="ritual-day-button group" data-day="tuesday">
+                    <div class="bg-rose-clay/20 hover:bg-rose-clay/30 border border-rose-clay/50 rounded-lg p-4 text-center transition-all duration-200 relative">
+                        <div class="completion-badge hidden absolute -top-2 -right-2 bg-mint text-dark-indigo rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">✓</div>
+                        <div class="text-2xl mb-1">⚡</div>
+                        <div class="text-sm font-medium text-soft-cream">Tuesday</div>
+                        <div class="text-xs text-soft-cream/70 mt-1">Action</div>
+                    </div>
+                </a>
+                
+                <a href="wednesday.html" class="ritual-day-button group" data-day="wednesday">
+                    <div class="bg-rose-clay/20 hover:bg-rose-clay/30 border border-rose-clay/50 rounded-lg p-4 text-center transition-all duration-200 relative">
+                        <div class="completion-badge hidden absolute -top-2 -right-2 bg-mint text-dark-indigo rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">✓</div>
+                        <div class="text-2xl mb-1">💎</div>
+                        <div class="text-sm font-medium text-soft-cream">Wednesday</div>
+                        <div class="text-xs text-soft-cream/70 mt-1">Wisdom</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <a href="thursday.html" class="ritual-day-button group" data-day="thursday">
+                    <div class="bg-rose-clay/20 hover:bg-rose-clay/30 border border-rose-clay/50 rounded-lg p-4 text-center transition-all duration-200 relative">
+                        <div class="completion-badge hidden absolute -top-2 -right-2 bg-mint text-dark-indigo rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">✓</div>
+                        <div class="text-2xl mb-1">🌿</div>
+                        <div class="text-sm font-medium text-soft-cream">Thursday</div>
+                        <div class="text-xs text-soft-cream/70 mt-1">Growth</div>
+                    </div>
+                </a>
+                
+                <a href="friday.html" class="ritual-day-button group" data-day="friday">
+                    <div class="bg-rose-clay/20 hover:bg-rose-clay/30 border border-rose-clay/50 rounded-lg p-4 text-center transition-all duration-200 relative">
+                        <div class="completion-badge hidden absolute -top-2 -right-2 bg-mint text-dark-indigo rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">✓</div>
+                        <div class="text-2xl mb-1">💝</div>
+                        <div class="text-sm font-medium text-soft-cream">Friday</div>
+                        <div class="text-xs text-soft-cream/70 mt-1">Love</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3">
+                <a href="saturday.html" class="ritual-day-button group" data-day="saturday">
+                    <div class="bg-rose-clay/20 hover:bg-rose-clay/30 border border-rose-clay/50 rounded-lg p-4 text-center transition-all duration-200 relative">
+                        <div class="completion-badge hidden absolute -top-2 -right-2 bg-mint text-dark-indigo rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">✓</div>
+                        <div class="text-2xl mb-1">🕊️</div>
+                        <div class="text-sm font-medium text-soft-cream">Saturday</div>
+                        <div class="text-xs text-soft-cream/70 mt-1">Rest</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Reflection Button -->
+        <div class="mb-6">
+            <a href="reflection.html" class="block">
+                <div class="bg-amethyst/20 hover:bg-amethyst/30 border border-amethyst/50 rounded-lg p-4 text-center transition-all duration-200">
+                    <div class="text-2xl mb-2">🧘</div>
+                    <div class="text-lg font-medium text-amethyst">Reflection</div>
+                    <div class="text-xs text-soft-cream/70 mt-1">Review & Gratitude</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 p-4 bg-dark-indigo/50 rounded-lg border border-quartz/30">
+            <p class="text-soft-cream/70 text-sm mb-4">Sacred practice for spiritual expansion</p>
+            <div class="space-y-3">
+                <button onclick="logout()" class="w-full bg-amethyst/30 hover:bg-amethyst/40 border border-amethyst text-amethyst px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200">
+                    🔐 Access Password Screen
+                </button>
+                <button onclick="forceRefreshHabitTracking()" class="w-full bg-mint/30 hover:bg-mint/40 border border-mint text-mint px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200">
+                    🔄 Refresh Habit Tracking
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Initialize the homepage when it loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isAuthenticated()) {
+                showMainContent();
+            }
+        });
+
+        // Password protection
+        const SACRED_PASSWORD = "blessed"; // Change this to your desired password
+
+        function checkPassword() {
+            const passwordInput = document.getElementById('password-input');
+            const errorDiv = document.getElementById('password-error');
+            const enteredPassword = passwordInput.value;
+
+            if (enteredPassword === SACRED_PASSWORD) {
+                localStorage.setItem('ritual-authenticated', 'true');
+                showMainContent();
+                errorDiv.classList.add('hidden');
+            } else {
+                errorDiv.classList.remove('hidden');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+
+        function isAuthenticated() {
+            return localStorage.getItem('ritual-authenticated') === 'true';
+        }
+
+        function showMainContent() {
+            document.getElementById('password-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            
+            // Wait for script.js to load before calling functions
+            if (document.readyState === 'complete') {
+                initializeMainContent();
+            } else {
+                window.addEventListener('load', initializeMainContent);
+            }
+        }
+        
+        function initializeMainContent() {
+            // Check for weekly reset first
+            if (typeof checkWeeklyReset === 'function') {
+                checkWeeklyReset();
+            }
+            
+            if (typeof loadDailyQuote === 'function') {
+                loadDailyQuote();
+            }
+            
+            if (typeof updateCompletionBadges === 'function') {
+                updateCompletionBadges();
+            }
+            
+            if (typeof updateHabitTracking === 'function') {
+                updateHabitTracking();
+            }
+            
+            registerServiceWorker();
+        }
+
+        function logout() {
+            localStorage.removeItem('ritual-authenticated');
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('password-screen').style.display = 'flex';
+            document.getElementById('password-input').focus();
+        }
+
+        function forceRefreshHabitTracking() {
+            console.log('Force refreshing habit tracking...');
+            if (typeof updateHabitTracking === 'function') {
+                updateHabitTracking();
+            }
+            if (typeof updateCompletionBadges === 'function') {
+                updateCompletionBadges();
+            }
+        }
+
+        // Completely disable service worker and clear all caches
+        function registerServiceWorker() {
+            console.log('Service Worker registration completely disabled');
+            
+            // Unregister all existing service workers
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (let registration of registrations) {
+                        console.log('Unregistering service worker:', registration.scope);
+                        registration.unregister();
+                    }
+                });
+            }
+            
+            // Clear all caches
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    names.forEach(name => {
+                        console.log('Clearing cache:', name);
+                        caches.delete(name);
+                    });
+                });
+            }
+        }
+
+        // Enter key support for password and debugging
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🌟 Ritual Rhythm v2.0 - Habit Tracking Enabled - DOM Loaded');
+            
+            const passwordInput = document.getElementById('password-input');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+                passwordInput.focus();
+            }
+            
+            // Debug: Check if habit tracking section exists after 2 seconds
+            setTimeout(() => {
+                const habitSection = document.querySelector('.bg-amethyst\\/20');
+                console.log('Habit tracking section found:', habitSection ? 'YES' : 'NO');
+                if (habitSection) {
+                    console.log('Habit section visible and loaded successfully');
+                } else {
+                    console.error('⚠️ HABIT TRACKING SECTION NOT FOUND - This indicates a caching issue');
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

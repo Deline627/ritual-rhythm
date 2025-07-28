@@ -1,0 +1,9 @@
+node_modules/
+.env
+.DS_Store
+*.log
+ritual-rhythm-deploy/
+*.tar.gz
+start.sh
+server.js
+package*.json
